@@ -2,8 +2,95 @@
 #include <iostream>
 #include <map>
 #include <clocale>
+#include <vector>
+#include <format>
+#include <array>
+#include <sstream>
 
 using namespace std;
+constexpr std::array<int, 21> attributeEnums = {
+        FILE_ATTRIBUTE_HIDDEN,
+        FILE_ATTRIBUTE_SYSTEM,
+        FILE_ATTRIBUTE_DIRECTORY,
+        FILE_ATTRIBUTE_ARCHIVE,
+        FILE_ATTRIBUTE_DEVICE,
+        FILE_ATTRIBUTE_NORMAL,
+        FILE_ATTRIBUTE_TEMPORARY,
+        FILE_ATTRIBUTE_SPARSE_FILE,
+        FILE_ATTRIBUTE_REPARSE_POINT,
+        FILE_ATTRIBUTE_COMPRESSED,
+        FILE_ATTRIBUTE_OFFLINE,
+        FILE_ATTRIBUTE_NOT_CONTENT_INDEXED,
+        FILE_ATTRIBUTE_ENCRYPTED,
+        FILE_ATTRIBUTE_INTEGRITY_STREAM,
+        FILE_ATTRIBUTE_VIRTUAL,
+        FILE_ATTRIBUTE_NO_SCRUB_DATA,
+        FILE_ATTRIBUTE_EA,
+        FILE_ATTRIBUTE_PINNED,
+        FILE_ATTRIBUTE_UNPINNED,
+        FILE_ATTRIBUTE_RECALL_ON_OPEN,
+        FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS
+};
+
+
+std::map<int, std::string> attributeMap = {
+        {FILE_ATTRIBUTE_HIDDEN, "Hidden"},
+        {FILE_ATTRIBUTE_SYSTEM, "Part of OS"},
+        {FILE_ATTRIBUTE_DIRECTORY, "Directory"},
+        {FILE_ATTRIBUTE_ARCHIVE, "Marked for backup or removal"},
+        {FILE_ATTRIBUTE_DEVICE, "Reserved for system use"},
+        {FILE_ATTRIBUTE_NORMAL, "Normal"},
+        {FILE_ATTRIBUTE_TEMPORARY, "Temporary"},
+        {FILE_ATTRIBUTE_SPARSE_FILE, "Sparse file"},
+        {FILE_ATTRIBUTE_REPARSE_POINT, "Reparse point or symbolic link"},
+        {FILE_ATTRIBUTE_COMPRESSED, "Compressed"},
+        {FILE_ATTRIBUTE_OFFLINE, "Offline"},
+        {FILE_ATTRIBUTE_NOT_CONTENT_INDEXED, "Not content indexed"},
+        {FILE_ATTRIBUTE_ENCRYPTED, "Encrypted"},
+        {FILE_ATTRIBUTE_INTEGRITY_STREAM, "Integrity stream"},
+        {FILE_ATTRIBUTE_VIRTUAL, "Virtual"},
+        {FILE_ATTRIBUTE_NO_SCRUB_DATA, "No scrub data"},
+        {FILE_ATTRIBUTE_EA, "Extended attributes"},
+        {FILE_ATTRIBUTE_PINNED, "Pinned"},
+        {FILE_ATTRIBUTE_UNPINNED, "Unpinned"},
+        {FILE_ATTRIBUTE_RECALL_ON_OPEN, "Recall on open"},
+        {FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS, "Recall on data access"}
+};
+
+vector<string> getListOfAttributes(DWORD mask) {
+    std::vector<std::string> result;
+
+    for (auto attr : attributeEnums) {
+        if (mask & attr) {
+            result.emplace_back(attributeMap.at(attr));
+        }
+    }
+    return result;
+}
+
+vector<string> getFileAttributesInternal(string path) {
+    auto attributesMask = GetFileAttributesA(path.c_str());
+    if (attributesMask == INVALID_FILE_ATTRIBUTES) {
+        cout << "Something went wrong!\n";
+        return {};
+    }
+
+    return getListOfAttributes(attributesMask);
+}
+
+void getFileAttributes() {
+    cout << "Enter file path: ";
+    string path;
+    cin >> path;
+
+    auto attributes = getFileAttributesInternal(path);
+
+    for (auto& el : attributes) {
+        cout << format(" {}\n", el);
+    }
+
+}
+
 
 void showMenu(){
     cout<<"Options: "<<endl;
@@ -119,21 +206,21 @@ void createAndRemoveDirectory( int param) {
 }
 
 void copyAndMoveFile(int check){
-    if (check==1){
-        int input;
-        LPCTSTR lpExistingFileName;
-        LPCTSTR lpNewFileName;
-        WINBOOL bFailIfExists;
-        string temp_existF, temp_newF;
+    int input;
+    LPCTSTR lpExistingFileName;
+    LPCTSTR lpNewFileName;
+    WINBOOL bFailIfExists;
+    string temp_existF, temp_newF;
 
-        cout<<"Input existing file directory:";
-        cin>>temp_existF;
-        lpExistingFileName = temp_existF.c_str();
-        cout<<"Input new file directory:";
-        cin>>temp_newF;
-        lpNewFileName = temp_newF.c_str();
-        cout<<"Input 0 to rewrite file (if already exist) and 1 else:  ";
-        std::cin >> input;
+    cout<<"Input existing file directory:";
+    cin>>temp_existF;
+    lpExistingFileName = temp_existF.c_str();
+    cout<<"Input new file directory:";
+    cin>>temp_newF;
+    lpNewFileName = temp_newF.c_str();
+    cout<<"Input 0 to rewrite file (if already exist) and 1 else:  ";
+    std::cin >> input;
+    if (check==1){
 
         // Преобразование ввода в BOOL
         bFailIfExists = (input == 0) ? FALSE : TRUE;
@@ -146,7 +233,39 @@ void copyAndMoveFile(int check){
 
         }
     }
+    if (check==2){
+
+        bFailIfExists = (input == 0) ? MOVEFILE_REPLACE_EXISTING : 0;
+        // Перемещение файла
+        if (MoveFileEx(lpExistingFileName, lpNewFileName, bFailIfExists) != 0) {
+            std::wcout << L"File moved successfully." << std::endl;
+        } else {
+            DWORD error = GetLastError();
+            if (error == ERROR_ALREADY_EXISTS) {
+                std::wcerr << L"File with the same name already exists in the target directory." << std::endl;
+            } else {
+                std::wcerr << L"Failed to move file. Error code: " << error << std::endl;
+            }
+        }
+    }
+    else {
+        cout<<"You input incorrect number."<<endl;
+    }
 }
+
+/*void getAndSetAttributes(){
+    LPCSTR filePath = "E:\\aaa\\3.txt";
+
+    // Получаем атрибуты файла
+    DWORD fileAttributes = GetFileAttributes(filePath);
+    if (fileAttributes == INVALID_FILE_ATTRIBUTES) {
+        std::cerr << "Failed to get file attributes. Error code: " << GetLastError() << std::endl;
+    }
+
+    // Выводим атрибуты файла
+    std::cout << "File attributes: " << fileAttributes << std::endl;
+
+}*/
 
 void newFile(LPCSTR fileName){
     HANDLE hFile = CreateFile(
@@ -166,9 +285,61 @@ void newFile(LPCSTR fileName){
         cout << "File created successfully." << endl;
     }
 
-
-
     CloseHandle(hFile); // Закрываем дескриптор файла
+}
+void setFileAttributes() {
+
+    cout << "Enter file path: ";
+    string path;
+    cin >> path;
+
+    auto attributes = getFileAttributesInternal(path);
+
+    cout << "Current attributes:\n";
+    for (auto &el: attributes) {
+        cout << format(" {}\n", el);
+    }
+
+    cout << "List of available attributes:\n";
+    for (int i = 0; i < attributeEnums.size(); ++i) {
+        cout << format(" {}){}\n", i + 1, attributeMap.at(attributeEnums[i]));
+    }
+    cout << endl;
+    cout << "Enter indexes which you want to add: ";
+    string indexesLine;
+
+    // Disable skipping whitespace characters
+    cin >> ws >> noskipws;
+
+    // Read from stdin until the end of the line
+    char c;
+    while (cin >> c && c != '\n') {
+        indexesLine += c;
+    }
+
+    // Enable skipping whitespace characters again
+    cin >> skipws;
+    stringstream ss(indexesLine);
+
+    vector<int> indexes;
+
+    int index;
+    while (ss >> index) {
+        indexes.push_back(index);
+    }
+
+    DWORD attributeMask = 0;
+    for (auto el: indexes) {
+        attributeMask |= attributeEnums[el - 1];
+    }
+
+    if (!SetFileAttributesA(path.c_str(), attributeMask)) {
+        DWORD error = GetLastError();
+        cout << format("error: {}\n", error);
+        return;
+    }
+    cout << "Attributes added successfully!" << endl;
+
 }
 
 int main(void)
@@ -216,13 +387,31 @@ int main(void)
                 break;
 
             }
-            case 5:
-                copyAndMoveFile(1);
+            case 5: {
+                int check;
+                cout<<"Input 1 to copy, 2 to remove: ";
+                cin>>check;
+                copyAndMoveFile(check);
                 system("pause");
                 break;
-            /*case 6:
-                analysing
-*/
+            }
+            case 6: {
+                int check;
+                cout<<"Input 1 to get 2 to set attributes: ";
+                cin>> check;
+                if(check == 1){
+                    getFileAttributes();
+                }
+                else if(check==2){
+                    setFileAttributes();
+                }
+                else{
+                    cout<<"Incorrect input"<<endl;
+                }
+                system("pause");
+                break;
+            }
+
         }
 
     }while (check!=0);
