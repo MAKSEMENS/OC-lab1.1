@@ -100,6 +100,7 @@ void showMenu(){
     cout<<"  Creating files - 4"<<endl;
     cout<<"  Copying and removing files - 5"<<endl;
     cout<<"  Analyzing and changing file attributes -6"<<endl;
+    cout<<"  Get or set file time - 7"<<endl;
     cout<<"  Exit - 0"<<endl;
 }
 void showDrives(){
@@ -287,6 +288,93 @@ void newFile(LPCSTR fileName){
 
     CloseHandle(hFile); // Закрываем дескриптор файла
 }
+
+void getFileTime() {
+    std::string path;
+    std::cout << "Enter path to file: ";
+    std::cin >> path;
+
+    HANDLE hFile1;
+    FILETIME ftCreate, ftLastAccess, ftLastWrite;
+    SYSTEMTIME stCreate, stAccess, stWrite;
+
+    hFile1 = CreateFile(path.c_str(),
+                        GENERIC_READ,
+                        FILE_SHARE_READ,
+                        nullptr,
+                        OPEN_EXISTING,
+                        FILE_ATTRIBUTE_NORMAL,
+                        nullptr);
+
+    if (hFile1 == INVALID_HANDLE_VALUE) {
+        DWORD error = GetLastError();
+        std::cout << "Failed to open file. Error: " << error<< std::endl;
+        return;
+    }
+
+    if (!GetFileTime(hFile1, &ftCreate, &ftLastAccess, &ftLastWrite)) {
+        DWORD error = GetLastError();
+        std::cout << "Failed to get file time. Error: " << error << std::endl;
+        CloseHandle(hFile1);
+        return;
+    }
+
+
+    FileTimeToSystemTime(&ftCreate, &stCreate);
+    FileTimeToSystemTime(&ftLastAccess, &stAccess);
+    FileTimeToSystemTime(&ftLastWrite, &stWrite);
+
+    std::cout << "File creation time: " << stCreate.wDay << "/" << stCreate.wMonth << "/" << stCreate.wYear << " "
+              << stCreate.wHour + 3 << ":" << stCreate.wMinute << std::endl;
+    std::cout << "Last access time: " << stAccess.wDay << "/" << stAccess.wMonth << "/" << stAccess.wYear << " "
+              << stAccess.wHour + 3 << ":" << stAccess.wMinute << std::endl;
+    std::cout << "Last write time: " << stWrite.wDay << "/" << stWrite.wMonth << "/" << stWrite.wYear << " "
+              << stWrite.wHour + 3 << ":" << stWrite.wMinute << std::endl;
+
+    CloseHandle(hFile1);
+}
+
+void setFileTime() {
+    string path;
+    cout << "Enter path to file: ";
+    cin >> path;
+
+    cout << "Enter date {dd mm yyyy}: ";
+    int day, month, year;
+    cin >> day >> month >> year;
+
+    SYSTEMTIME systemTime;
+
+    GetSystemTime(&systemTime);
+
+    systemTime.wDay = day;
+    systemTime.wMonth = month;
+    systemTime.wYear = year;
+
+    FILETIME fileTime;
+
+    SystemTimeToFileTime(&systemTime, &fileTime);
+
+    HANDLE filename = CreateFile(path.c_str(),
+                                 FILE_WRITE_ATTRIBUTES,
+                                 FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                 nullptr,
+                                 OPEN_EXISTING,
+                                 FILE_ATTRIBUTE_NORMAL,
+                                 nullptr);
+
+    if (filename != INVALID_HANDLE_VALUE) {
+        SetFileTime(filename,
+                    (LPFILETIME) nullptr,
+                    (LPFILETIME) nullptr,
+                    &fileTime);
+        CloseHandle(filename);
+        cout << "File time set successfully." << endl;
+    } else {
+        cout << "Failed to open file." << endl;
+    }
+}
+
 void setFileAttributes() {
 
     cout << "Enter file path: ";
@@ -404,6 +492,23 @@ int main(void)
                 }
                 else if(check==2){
                     setFileAttributes();
+                }
+                else{
+                    cout<<"Incorrect input"<<endl;
+                }
+                system("pause");
+                break;
+            }
+            case 7:
+            {
+                int check;
+                cout<<"Input 1 to get, 2 to set file time"<<endl;
+                cin>>check;
+                if(check == 1){
+                    getFileTime();
+                }
+                else if(check==2){
+                    setFileTime();
                 }
                 else{
                     cout<<"Incorrect input"<<endl;
