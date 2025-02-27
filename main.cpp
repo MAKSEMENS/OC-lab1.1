@@ -9,6 +9,7 @@
 
 using namespace std;
 constexpr std::array<int, 21> attributeEnums = {
+
         FILE_ATTRIBUTE_HIDDEN,
         FILE_ATTRIBUTE_SYSTEM,
         FILE_ATTRIBUTE_DIRECTORY,
@@ -30,6 +31,7 @@ constexpr std::array<int, 21> attributeEnums = {
         FILE_ATTRIBUTE_UNPINNED,
         FILE_ATTRIBUTE_RECALL_ON_OPEN,
         FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS
+
 };
 
 
