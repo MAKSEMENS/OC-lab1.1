@@ -70,6 +70,7 @@ vector<string> getListOfAttributes(DWORD mask) {
             result.emplace_back(attributeMap.at(attr));
         }
     }
+        
     return result;
 }
 
