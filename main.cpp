@@ -162,11 +162,13 @@ void getDiskInfo ( string diskName)
     if (GetVolumeInformation(pairs.at(diskName),NameBuffer, sizeof(NameBuffer),
                              &VSNumber,&MCLength,&FileSF,SysNameBuffer,sizeof(SysNameBuffer)))
     {
+            
         cout <<  "Tom name: " << NameBuffer << endl;
         cout << "File system name: " << SysNameBuffer << endl;
         cout << "Serial number: " << VSNumber << endl;
         cout <<  "Max length of tom's name: " <<MCLength << endl;
         cout <<  "File system flag: " <<FileSF << endl;
+            
     }
 
     ULARGE_INTEGER freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes;
