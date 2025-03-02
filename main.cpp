@@ -7,6 +7,7 @@
 #include <array>
 #include <sstream>
 
+
 using namespace std;
 constexpr std::array<int, 21> attributeEnums = {
 
