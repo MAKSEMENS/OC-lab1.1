@@ -97,6 +97,7 @@ void getFileAttributes() {
 
 
 void showMenu(){
+        
     cout<<"Options: "<<endl;
     cout<<"  Show disc list - 1"<<endl;
     cout<<"  Show info about disc - 2"<<endl;
@@ -106,6 +107,7 @@ void showMenu(){
     cout<<"  Analyzing and changing file attributes -6"<<endl;
     cout<<"  Get or set file time - 7"<<endl;
     cout<<"  Exit - 0"<<endl;
+        
 }
 void showDrives(){
     DWORD dwDrives  = 0, dwMask = 1;
