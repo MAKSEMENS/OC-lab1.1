@@ -129,10 +129,12 @@ void getDiskInfo ( string diskName)
 {
     map<string, LPCSTR> pairs
             {
+        
                     {"A","A:\\"}, {"B","B:\\"},{"C", "C:\\"},{"D", "D:\\"},
                     {"E", "E:\\"},{"F", "F:\\"},{"G", "G:\\"},{"H", "H:\\"},
                     {"I", "I:\\"},{"J", "J:\\"},{"K", "K:\\"},{"L", "L:\\"},
                     {"M", "M:\\"},{"N", "N:\\"},{"O", "O:\\"},{"P", "P:\\"}
+        
             };
     int type = GetDriveType(pairs.at(diskName));
     cout<<"Drive type:";
