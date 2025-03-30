@@ -37,6 +37,7 @@ constexpr std::array<int, 21> attributeEnums = {
 
 
 std::map<int, std::string> attributeMap = {
+
         {FILE_ATTRIBUTE_HIDDEN, "Hidden"},
         {FILE_ATTRIBUTE_SYSTEM, "Part of OS"},
         {FILE_ATTRIBUTE_DIRECTORY, "Directory"},
