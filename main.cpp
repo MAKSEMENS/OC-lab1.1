@@ -98,7 +98,6 @@ void getFileAttributes() {
 
 
 void showMenu(){
-        
     cout<<"Options: "<<endl;
     cout<<"  Show disc list - 1"<<endl;
     cout<<"  Show info about disc - 2"<<endl;
