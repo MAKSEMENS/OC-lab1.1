@@ -75,6 +75,7 @@ vector<string> getListOfAttributes(DWORD mask) {
 }
 
 vector<string> getFileAttributesInternal(string path) {
+        
     auto attributesMask = GetFileAttributesA(path.c_str());
     if (attributesMask == INVALID_FILE_ATTRIBUTES) {
         cout << "Something went wrong!\n";
