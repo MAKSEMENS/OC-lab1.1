@@ -86,6 +86,7 @@ vector<string> getFileAttributesInternal(string path) {
 }
 
 void getFileAttributes() {
+
     cout << "Enter file path: ";
     string path;
     cin >> path;
