@@ -534,7 +534,7 @@ int main(void)
 
         }
 
-    }while (check!=0);
+    } while (check!=0);
 
     return 0;
 }
