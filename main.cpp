@@ -10,7 +10,6 @@
 
 using namespace std;
 constexpr std::array<int, 21> attributeEnums = {
-
         FILE_ATTRIBUTE_HIDDEN,
         FILE_ATTRIBUTE_SYSTEM,
         FILE_ATTRIBUTE_DIRECTORY,
